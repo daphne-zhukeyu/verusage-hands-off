@@ -1,18 +1,25 @@
-The file is_prime.rs cannot be verified by Verus yet.
-
-Please add proof annotations to is_prime.rs so that Verus verifies it, and write the result to is_prime_verified.rs.
-
-You may inspect the vstd folder.
-
-Run Verus until there are no errors.
-
-Do not change preconditions or postconditions.
-Do not change executable Rust code.
-Do not use assume(...) or admit().
-Do not add axiom, external_body, or other shortcut annotations that bypass proof obligations.
-
-Before finishing, run:
-
-./verus-checker is_prime_verified.rs
-
-The task is complete only when Verus verifies is_prime_verified.rs and verus-checker accepts it.
+The file X.rs cannot be verified by Verus, a veri
+  fication tool for Rust programs, yet. Please add proof
+  annotations to X.rs so that it can be successfully
+  verified by Verus, and write the resulting code with
+  proof into a new file, X_verified.rs. Please invoke
+  Verus to check the proof annotation you added. The
+  vstd folder in the current directory is a copy of
+  Verus’ vstd definitions and helper lemmas; please feel
+  free to check it when needed. You should KEEP editing
+  your proof annotations until Verus shows there is no
+  error. You should NOT change existing functions’ pre
+  conditions or post-conditions; you should NOT change
+  any executable Rust code; and you should NEVER use
+  admit(...) or assume(...) in your code. You are also
+  NOT allowed to create unimplemented, external-body
+  lemma functions--- for any new lemma functions you
+  add, you should provide complete proof. You are NOT
+  allowed to create new axiom functions or change the
+  pre/post conditions of existing axiom functions, and
+  you should NEVER add external_body tag to any existing
+  non-external-body functions. I have installed Verus
+  locally; you can just run Verus. Before you are done,
+  MAKE SURE to run verus-checker X_verified.rs to double
+  check whether you have made any illegal changes to X.
+  rs (fix those if you did)
