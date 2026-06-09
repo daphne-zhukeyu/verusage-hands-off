@@ -42,10 +42,16 @@ python hands-off/prepare_task.py \
   --copy
 ```
 
-If your checker backend is the raw `lynette` binary, use `--checker-kind lynette-additions`. The helper will place `lynette` in the task directory and generate a `verus-checker` wrapper that runs:
+If your checker backend is the raw `lynette` binary, use `--checker-kind lynette-additions`. The helper will place `lynette` in the task directory and generate a `verus-checker` wrapper that infers the original file from `<name>_verified.rs` and runs:
 
 ```bash
 lynette additions <original-file> <changed-file>
+```
+
+If the wrapper cannot infer the original file, pass it explicitly:
+
+```bash
+./verus-checker <changed-file> <original-file>
 ```
 
 For this workspace, after building `utils/lynette/source/target/release/lynette`, the command is:

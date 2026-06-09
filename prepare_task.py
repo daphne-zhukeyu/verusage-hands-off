@@ -138,17 +138,38 @@ The task is complete only when Verus verifies {verified_name} and verus-checker 
     (task_dir / "HANDS_OFF_PROMPT.md").write_text(prompt, encoding="utf-8")
 
 
-def write_lynette_checker_wrapper(task_dir: Path, input_name: str, lynette_name: str) -> None:
+def write_lynette_checker_wrapper(task_dir: Path, lynette_name: str) -> None:
     wrapper = f"""#!/usr/bin/env bash
 set -euo pipefail
 
-if [ "$#" -ne 1 ]; then
-  echo "usage: ./verus-checker <changed-file>" >&2
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+  echo "usage: ./verus-checker <changed-file> [original-file]" >&2
   exit 2
 fi
 
 DIR="$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)"
-exec "$DIR/{lynette_name}" additions "$DIR/{input_name}" "$1"
+CHANGED="$1"
+
+if [ "$#" -eq 2 ]; then
+  ORIGINAL="$2"
+else
+  CHANGED_BASENAME="$(basename "$CHANGED")"
+  if [[ "$CHANGED_BASENAME" == *_verified.rs ]]; then
+    ORIGINAL_BASENAME="${{CHANGED_BASENAME%_verified.rs}}.rs"
+    ORIGINAL="$DIR/$ORIGINAL_BASENAME"
+  else
+    mapfile -t ORIGINAL_CANDIDATES < <(
+      find "$DIR" -maxdepth 1 -type f -name '*.rs' ! -name '*_verified.rs' -printf '%p\\n'
+    )
+    if [ "${{#ORIGINAL_CANDIDATES[@]}}" -ne 1 ]; then
+      echo "could not infer original file; pass it explicitly as the second argument" >&2
+      exit 2
+    fi
+    ORIGINAL="${{ORIGINAL_CANDIDATES[0]}}"
+  fi
+fi
+
+exec "$DIR/{lynette_name}" additions "$ORIGINAL" "$CHANGED"
 """
     wrapper_path = task_dir / "verus-checker"
     wrapper_path.write_text(wrapper, encoding="utf-8")
@@ -185,7 +206,7 @@ def main() -> None:
         copy_or_link(checker, task_dir / lynette_name, args.copy)
         if checker.name.endswith(".exe"):
             raise SystemExit("lynette-additions wrapper is currently supported for WSL/Linux")
-        write_lynette_checker_wrapper(task_dir, input_file.name, lynette_name)
+        write_lynette_checker_wrapper(task_dir, lynette_name)
     else:
         copy_or_link(checker, task_dir / checker_name, args.copy)
     copy_or_link(vstd, task_dir / "vstd", args.copy)
