@@ -4,6 +4,17 @@ This directory supports the hands-off approach: give a generic coding agent one 
 
 This is intentionally separate from VeruSAGE. Do not run `verusage/main.py` for this flow.
 
+## Required Environment
+
+This repository does not vendor Verus, vstd, z3, or the checker backend. To prepare a runnable hands-off task directory, the machine running `prepare_task.py` needs:
+
+- Python 3.
+- A local Verus installation with the `verus` executable and its adjacent runtime files. `prepare_task.py` discovers `vstd/`, `z3`, `rust_verify`, `libvstd.rlib`, macro libraries, and related files from the directory containing the `verus` executable.
+- A checker backend, either a `verus-checker` executable or a built `lynette` binary used with `--checker-kind lynette-additions`.
+- Codex or another coding agent for the actual hands-off repair run.
+
+The generated task directory can use symlinks to those local Verus/checker files, or physical copies if `--copy` is passed. Symlinked task directories are only runnable on machines where the symlink targets still exist.
+
 ## Directory Shape
 
 Each prepared task directory should look like this:
@@ -24,21 +35,21 @@ The helper also links or copies the supporting Verus runtime files from the Veru
 From the repository root:
 
 ```bash
-python hands-off/prepare_task.py \
-  benchmarks/Verus-Bench/CloverBench/unverified/is_prime.rs \
+python prepare_task.py \
+  tasks/task_is_prime/is_prime.rs \
   --verus ../verus/verus \
   --checker /path/to/verus-checker \
-  --out-dir hands-off/tasks/task_is_prime
+  --out-dir tasks/task_is_prime_runtime
 ```
 
 By default, large Verus assets are symlinked. Use `--copy` if the task directory must be physically self-contained:
 
 ```bash
-python hands-off/prepare_task.py \
-  benchmarks/Verus-Bench/CloverBench/unverified/is_prime.rs \
+python prepare_task.py \
+  tasks/task_is_prime/is_prime.rs \
   --verus ../verus/verus \
   --checker /path/to/verus-checker \
-  --out-dir hands-off/tasks/task_is_prime \
+  --out-dir tasks/task_is_prime_runtime \
   --copy
 ```
 
@@ -57,12 +68,12 @@ If the wrapper cannot infer the original file, pass it explicitly:
 For this workspace, after building `utils/lynette/source/target/release/lynette`, the command is:
 
 ```bash
-python hands-off/prepare_task.py \
-  benchmarks/Verus-Bench/CloverBench/unverified/is_prime.rs \
+python prepare_task.py \
+  tasks/task_is_prime/is_prime.rs \
   --verus ../verus/verus \
-  --checker utils/lynette/source/target/release/lynette \
+  --checker ../verus-proof-synthesis/utils/lynette/source/target/release/lynette \
   --checker-kind lynette-additions \
-  --out-dir hands-off/tasks/task_is_prime
+  --out-dir tasks/task_is_prime_runtime
 ```
 
 Use `--force` to replace an existing prepared task directory.
@@ -72,7 +83,7 @@ Use `--force` to replace an existing prepared task directory.
 Before starting the coding agent:
 
 ```bash
-cd hands-off/tasks/task_is_prime
+cd tasks/task_is_prime_runtime
 ./verus is_prime.rs
 ./verus-checker is_prime.rs
 ```
