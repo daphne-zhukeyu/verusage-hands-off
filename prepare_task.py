@@ -116,24 +116,7 @@ def ensure_executable(path: Path) -> None:
 
 def write_prompt(task_dir: Path, input_name: str, checker_name: str) -> None:
     verified_name = f"{Path(input_name).stem}_verified.rs"
-    prompt = f"""The file {input_name} cannot be verified by Verus yet.
-
-Please add proof annotations to {input_name} so that Verus verifies it, and write the result to {verified_name}.
-
-You may inspect the vstd folder.
-
-Run Verus until there are no errors.
-
-Do not change preconditions or postconditions.
-Do not change executable Rust code.
-Do not use assume(...) or admit().
-Do not add axiom, external_body, or other shortcut annotations that bypass proof obligations.
-
-Before finishing, run:
-
-./{checker_name} {verified_name}
-
-The task is complete only when Verus verifies {verified_name} and verus-checker accepts it.
+    prompt = f"""The file {input_name} cannot be verified by Verus, a verification tool for Rust programs, yet. Please add proof annotations to {input_name} so that it can be successfully verified by Verus, and write the resulting code with proof into a new file, {verified_name}. Please invoke Verus to check the proof annotation you added. The vstd folder in the current directory is a copy of Verus' vstd definitions and helper lemmas; please feel free to check it when needed. You should KEEP editing your proof annotations until Verus shows there is no error. You should NOT change existing functions' preconditions or post-conditions; you should NOT change any executable Rust code; and you should NEVER use admit(...) or assume(...) in your code. You are also NOT allowed to create unimplemented, external-body lemma functions--- for any new lemma functions you add, you should provide complete proof. You are NOT allowed to create new axiom functions or change the pre/post conditions of existing axiom functions, and you should NEVER add external_body tag to any existing non-external-body functions. I have installed Verus locally; you can just run Verus. Before you are done, MAKE SURE to run {checker_name} {verified_name} to double check whether you have made any illegal changes to {input_name} (fix those if you did).
 """
     (task_dir / "HANDS_OFF_PROMPT.md").write_text(prompt, encoding="utf-8")
 
