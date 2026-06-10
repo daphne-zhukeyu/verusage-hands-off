@@ -1,6 +1,6 @@
-The file X.rs cannot be verified by Verus, a veri
-fication tool for Rust programs, yet. Please add proof
-annotations to X.rs so that it can be successfully
+The file X.rs cannot be verified by Verus, a verification tool for Rust programs, yet. 
+
+Please add proof annotations to X.rs so that it can be successfully
 verified by Verus, and write the resulting code with
 proof into a new file, X_verified.rs. Please invoke
 Verus to check the proof annotation you added. The
